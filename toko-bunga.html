@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toko Bunga - Katalog & QR Code</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --hijau: #2d6a4f;
+      --hijau-muda: #74c69d;
+      --krem: #fefae0;
+      --coklat: #a67c52;
+      --teks: #1b1b1b;
+      --teks-muted: #6b6b6b;
+      --border: #e0ddd5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--krem);
+      color: var(--teks);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--hijau);
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '🌿';
+      position: absolute; top: -10px; left: 20px;
+      font-size: 80px; opacity: 0.15;
+    }
+    header::after {
+      content: '🌸';
+      position: absolute; bottom: -10px; right: 20px;
+      font-size: 80px; opacity: 0.15;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+    header p {
+      margin-top: 6px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--hijau);
+      margin-bottom: 1.25rem;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    /* ── PRODUK GRID ── */
+    .produk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 2.5rem;
+    }
+
+    .kartu-produk {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      text-align: center;
+    }
+    .kartu-produk:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+      border-color: var(--hijau-muda);
+    }
+    .kartu-produk.aktif {
+      border: 2px solid var(--hijau);
+      box-shadow: 0 0 0 4px rgba(45,106,79,0.1);
+    }
+    .kartu-produk .emoji { font-size: 2.5rem; margin-bottom: 8px; }
+    .kartu-produk .nama {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    .kartu-produk .latin {
+      font-size: 11px;
+      color: var(--teks-muted);
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+    .kartu-produk .harga {
+      display: inline-block;
+      background: #e9f5ee;
+      color: var(--hijau);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── PANEL QR ── */
+    #panel-qr {
+      display: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+    #panel-qr .judul-panel {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--hijau);
+      margin-bottom: 1.25rem;
+    }
+
+    .panel-isi {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    /* kotak QR */
+    .kotak-qr {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    #qr-output {
+      background: #fff;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    #qr-output canvas,
+    #qr-output img { display: block; }
+
+    .label-qr {
+      font-size: 12px;
+      color: var(--teks-muted);
+      text-align: center;
+    }
+
+    .tombol-download {
+      background: var(--hijau);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+    .tombol-download:hover { background: #1e4d38; }
+
+    /* info bunga */
+    .info-bunga { flex: 1; min-width: 200px; }
+    .info-bunga h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .info-baris {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .info-key {
+      color: var(--teks-muted);
+      min-width: 90px;
+      font-size: 13px;
+    }
+    .info-val { color: var(--teks); }
+    .url-text {
+      font-size: 12px;
+      color: var(--hijau);
+      word-break: break-all;
+      margin-top: 4px;
+      background: #e9f5ee;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+
+    /* ── PANDUAN KODE ── */
+    .panduan {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .panduan p {
+      font-size: 14px;
+      color: var(--teks-muted);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+    pre {
+      background: #1b1b1b;
+      color: #a8d8a0;
+      padding: 1.25rem;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: 'Courier New', monospace;
+    }
+    .komentar { color: #6a9955; }
+    .tag { color: #569cd6; }
+    .attr { color: #9cdcfe; }
+    .str { color: #ce9178; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 12px;
+      color: var(--teks-muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🌺 Toko Bunga Nusantara</h1>
+  <p>Klik produk bunga untuk generate QR Code</p>
+</header>
+
+<main>
+
+  <!-- ── DAFTAR PRODUK ── -->
+  <h2 class="section-title">Katalog Produk</h2>
+
+  <!--
+    =====================================================
+    CARA MENAMBAH PRODUK:
+    Salin satu blok <div class="kartu-produk"> di bawah,
+    ganti emoji, nama, latin, harga, dan data-* nya.
+    =====================================================
+  -->
+  <div class="produk-grid">
+
+    <div class="kartu-produk"
+      data-nama="Mawar Merah"
+      data-latin="Rosa canina"
+      data-harga="Rp 15.000/tangkai"
+      data-makna="Cinta & kasih sayang"
+      data-perawatan="Siram setiap hari, hindari sinar langsung"
+      data-url="https://tokobungaku.com/mawar"
+      data-emoji="🌹"
+      onclick="tampilQR(this)">
+      <div class="emoji">🌹</div>
+      <div class="nama">Mawar Merah</div>
+      <div class="latin">Rosa canina</div>
+      <div class="harga">Rp 15.000</div>
+    </div>
+
+    <div class="kartu-produk"
+      data-nama="Tulip Pink"
+      data-latin="Tulipa gesneriana"
+      data-harga="Rp 25.000/tangkai"
+      data-makna="Cinta sempurna"
+      data-perawatan="Suhu dingin 15–18°C, ganti air tiap 2 hari"
+      data-url="https://tokobungaku.com/tulip"
+      data-emoji="🌷"
+      onclick="tampilQR(this)">
+      <div class="emoji">🌷</div>
+      <div class="nama">Tulip Pink</div>
+      <div class="latin">Tulipa gesneriana</div>
+      <div class="harga">Rp 25.000</div>
+    </div>
+
+    <div class="kartu-produk"
+      data-nama="Bunga Matahari"
+      data-latin="Helianthus annuus"
+      data-harga="Rp 20.000/tangkai"
+      data-makna="Kesetiaan & kebahagiaan"
+      data-perawatan="Sinar penuh, air sedang tiap 2 hari"
+      data-url="https://tokobungaku.com/sunflower"
+      data-emoji="🌻"
+      onclick="tampilQR(this)">
+      <div class="emoji">🌻</div>
+      <div class="nama">Bunga Matahari</div>
+      <div class="latin">Helianthus annuus</div>
+      <div class="harga">Rp 20.000</div>
+    </div>
+
+    <div class="kartu-produk"
+      data-nama="Lily Putih"
+      data-latin="Lilium candidum"
+      data-harga="Rp 30.000/tangkai"
+      data-makna="Kemurnian & keanggunan"
+      data-perawatan="Tanah lembab, naungan parsial, pupuk 2 minggu sekali"
+      data-url="https://tokobungaku.com/lily"
+      data-emoji="🤍"
+      onclick="tampilQR(this)">
+      <div class="emoji">🤍</div>
+      <div class="nama">Lily Putih</div>
+      <div class="latin">Lilium candidum</div>
+      <div class="harga">Rp 30.000</div>
+    </div>
+
+    <div class="kartu-produk"
+      data-nama="Anggrek Ungu"
+      data-latin="Phalaenopsis amabilis"
+      data-harga="Rp 75.000/pot"
+      data-makna="Kemewahan & kekaguman"
+      data-perawatan="Angin segar, siram seminggu 2x, jangan kena hujan langsung"
+      data-url="https://tokobungaku.com/anggrek"
+      data-emoji="🪷"
+      onclick="tampilQR(this)">
+      <div class="emoji">🪷</div>
+      <div class="nama">Anggrek Ungu</div>
+      <div class="latin">Phalaenopsis amabilis</div>
+      <div class="harga">Rp 75.000</div>
+    </div>
+
+  </div>
+  <!-- ── END PRODUK ── -->
+
+
+  <!-- ── PANEL QR (muncul setelah klik produk) ── -->
+  <div id="panel-qr">
+    <div class="judul-panel" id="judul-panel">QR Code Produk</div>
+    <div class="panel-isi">
+      <div class="kotak-qr">
+        <div id="qr-output"></div>
+        <div class="label-qr">Scan untuk info bunga</div>
+        <button class="tombol-download" onclick="downloadQR()">⬇ Download QR</button>
+      </div>
+      <div class="info-bunga" id="info-bunga"></div>
+    </div>
+  </div>
+
+
+  <!-- ── PANDUAN KODE ── -->
+  <div class="panduan">
+    <h2 class="section-title" style="margin-bottom:1rem">Cara pakai di VS Code</h2>
+    <p>
+      Ganti nilai <code>data-url</code> di tiap kartu produk dengan URL halaman bunga kamu yang sebenarnya.
+      Setelah website di-upload ke hosting (GitHub Pages, Netlify, dll), URL itu yang akan di-encode ke QR code.
+    </p>
+    <pre><span class="komentar">&lt;!-- Contoh mengganti URL produk --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"kartu-produk"</span>
+  <span class="attr">data-nama</span>=<span class="str">"Mawar Merah"</span>
+  <span class="attr">data-url</span>=<span class="str">"https://namamu.github.io/mawar"</span>
+  <span class="attr">data-harga</span>=<span class="str">"Rp 15.000"</span>
+  <span class="attr">onclick</span>=<span class="str">"tampilQR(this)"</span><span class="tag">&gt;</span>
+  ...
+<span class="tag">&lt;/div&gt;</span></pre>
+  </div>
+
+</main>
+
+<footer>
+  Dibuat dengan HTML + qrcode.js &nbsp;•&nbsp; Edit di VS Code, hosting gratis di GitHub Pages atau Netlify
+</footer>
+
+
+<script>
+  let namaAktif = '';
+
+  function tampilQR(el) {
+    // Hapus status aktif sebelumnya
+    document.querySelectorAll('.kartu-produk').forEach(k => k.classList.remove('aktif'));
+    el.classList.add('aktif');
+
+    // Ambil data dari atribut HTML
+    const nama      = el.dataset.nama;
+    const latin     = el.dataset.latin;
+    const harga     = el.dataset.harga;
+    const makna     = el.dataset.makna;
+    const perawatan = el.dataset.perawatan;
+    const url       = el.dataset.url;
+    const emoji     = el.dataset.emoji;
+    namaAktif       = nama;
+
+    // Tampilkan panel
+    const panel = document.getElementById('panel-qr');
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Judul panel
+    document.getElementById('judul-panel').textContent = emoji + ' QR Code — ' + nama;
+
+    // Info bunga
+    document.getElementById('info-bunga').innerHTML = `
+      <h3>${emoji} ${nama}</h3>
+      <div class="info-baris"><span class="info-key">Nama latin</span><span class="info-val">${latin}</span></div>
+      <div class="info-baris"><span class="info-key">Harga</span><span class="info-val">${harga}</span></div>
+      <div class="info-baris"><span class="info-key">Makna bunga</span><span class="info-val">${makna}</span></div>
+      <div class="info-baris"><span class="info-key">Perawatan</span><span class="info-val">${perawatan}</span></div>
+      <div class="info-baris"><span class="info-key">URL produk</span></div>
+      <div class="url-text">${url}</div>
+    `;
+
+    // Generate QR code
+    const qrOutput = document.getElementById('qr-output');
+    qrOutput.innerHTML = ''; // hapus QR sebelumnya
+    new QRCode(qrOutput, {
+      text: url,
+      width: 160,
+      height: 160,
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  function downloadQR() {
+    const canvas = document.querySelector('#qr-output canvas');
+    if (!canvas) return alert('Pilih produk dulu!');
+    const link = document.createElement('a');
+    link.download = 'qr-' + namaAktif.toLowerCase().replace(/\s+/g, '-') + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+</script>
+
+</body>
+</html>
