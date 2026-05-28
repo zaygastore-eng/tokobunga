@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bunga Matahari — Toko Bunga</title>
+  <style>
+    :root {
+      --hijau: #2d6a4f;
+      --krem: #fefae0;
+      --teks: #1b1b1b;
+      --border: #e0ddd5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--krem); color: var(--teks); min-height: 100vh; }
+    .container { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+    header { margin-bottom: 2rem; }
+    header h1 { font-size: 2rem; color: var(--hijau); }
+    header p { margin-top: 0.75rem; color: #4d4d4d; }
+    .product-page { display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; }
+    .product-image { flex: 1 1 360px; border-radius: 24px; overflow: hidden; border: 1px solid var(--border); }
+    .product-image img { width: 100%; display: block; }
+    .product-info { flex: 1 1 360px; background: #fff; border: 1px solid var(--border); border-radius: 24px; padding: 2rem; }
+    .product-info h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .product-info p { margin-bottom: 1.1rem; line-height: 1.8; }
+    .product-info .tag { display: inline-block; margin-bottom: 1rem; color: var(--hijau); font-weight: 600; }
+    .spec-list { list-style: none; margin-top: 1rem; padding: 0; }
+    .spec-list li { margin-bottom: 0.9rem; }
+    .spec-key { display: inline-block; min-width: 110px; color: #6b6b6b; }
+    .back-link { display: inline-block; margin-top: 1.75rem; padding: 0.9rem 1.5rem; background: var(--hijau); color: #fff; text-decoration: none; border-radius: 12px; }
+    footer { text-align: center; margin-top: 3rem; color: #6b6b6b; font-size: 13px; }
+    @media(max-width: 760px) { .product-page { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Bunga Matahari</h1>
+      <p>Halaman khusus produk setelah pemindaian QR Code.</p>
+    </header>
+    <div class="product-page">
+      <div class="product-image">
+        <img src="https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" alt="Bunga Matahari">
+      </div>
+      <div class="product-info">
+        <span class="tag">Bunga Spesial</span>
+        <h2>Bunga Matahari</h2>
+        <p>Bunga matahari memberi kesan ceria dan setia. Pas untuk suasana hangat dan penuh harapan.</p>
+        <ul class="spec-list">
+          <li><span class="spec-key">Nama latin:</span> Helianthus annuus</li>
+          <li><span class="spec-key">Harga:</span> Rp 20.000/tangkai</li>
+          <li><span class="spec-key">Makna:</span> Kesetiaan & kebahagiaan</li>
+          <li><span class="spec-key">Perawatan:</span> Sinar penuh, air sedang tiap 2 hari.</li>
+        </ul>
+        <a class="back-link" href="/index.html">Kembali ke katalog</a>
+      </div>
+    </div>
+    <footer>Tokobunga • QR Code product page</footer>
+  </div>
+</body>
+</html>
